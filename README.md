@@ -3,10 +3,16 @@
 
 ### Table of Contents
 
-@Hyrum to add
-A table of contents, which should indicate which notebook or scripts a stakeholder should start with, and a link to an executive summary.
-
-
+- Background
+- Approach Overview
+- The Data
+- EDA and Modeling
+- Classification and Modeling using no text data
+- Regression Modeling using text data
+- Classification and Regression Modeling using no text data
+- Results
+- Conclusions
+- Future Recs
 
 ## Background
 
@@ -52,10 +58,15 @@ In order to ascertain the strongest relationships between data and price predict
 
 The goal of the multi-classification problem was to predict if price the following day will go down, up, or stay the same. Accuracy will be the metric used to verify models and compare them. The baseline accuracy score: 38.01%.
 
-The goal of the regression models were to reduce MSE... why that metric since it's a weird one @Hyrum 
+Since accuracy is a measure for classification, the goal of the regression models was to reduce MSE and MAE to establish a basic relationship between text sentiment and the movement of the S&P 500. The error scores were produced using a GridSearch, producing best parameters for measurement of the relationship.
 
-Collaborated test size of 20%, 2 years of data for testing.
+Mean square error (MSE) is the average of the square of the errors. The larger the number the larger the error. MSE is an error metric, i.e. the lower the better.
 
+Mean Absolute Error (MAE). MAE is simply, as the name suggests, the mean of the absolute errors. The absolute error is the absolute value of the difference between the forecasted value and the actual value. MAE tells us how big of an error we can expect from the forecast on average. MAE is an error metric, i.e. the lower the better.
+
+https://stackoverflow.com/questions/45627784/unable-to-obtain-accuracy-score-for-my-linear
+
+Collaborated test size of 20%, equivalent to 2 years of data for testing.
 
 
 ### Classification and Modeling using text data
@@ -81,43 +92,88 @@ LSTM: 77.02%
 
 ###  Regression Modeling using text data
 
-@Hyrum
+In order to properly analyze the text, multiple approaches were used. Two different types of sentiment analysis were incorporated, Vader and TextBlob. Ultimately, the Vader sentiment analysis was more correlative to the direction of the price so it was used in concert with the movement in the market measured in percentage.
+
+Text was left as raw as possible for the regression models to create a baseline of understanding to see if further and more substantial analysis was merited. This means that the data used for the regression models were not lemmatized, nor were key words and stop words utilized to alter the outcome.
+
+Overall, 8 different regression models were tested using a basic pipeline.
+
+Linear Regression
+Gradient Boost
+KNeighbors
+Ridge
+Extra Trees
+Random Forest
+Lasso
+Decision Tree
+Based on R2 scores, the top three performing models were selected and put through a gridsearch to optimize their potential.
+
+Random Forest - 0.32MSE, 0.10MAE
+Extra Trees - 0.23MSE, 0.36MAE
+Decision Tree - 0.32MSE, 0.45MAE
+Consistent with the other modeling techniques used, the Random Forest regressor performed well enough to justify further modeling and analysis.
+
 
 ### Classification and Regression Modeling using no text data
 
 **Classification Models: (Accuracy Score)**
-Multinomial Bayes: 0.55
-FFNN: 0.80
-Recurrent Neural Network (RNN): 0.65
-LSTM: 0.81 
-Logistic Regression: 0.44 
-KNN: 0.77
-Decision Tree: 0.78 
-Bagging Classifier: 0.79
-Random Forest: 0.80 
-Gradient Boosting: 0.81
-XGB Classifier: 0.80
-SVC: 0.80
+- Multinomial Bayes: 0.55
+- FFNN: 0.80
+- Recurrent Neural Network (RNN): 0.65
+- LSTM: 0.81 
+- Logistic Regression: 0.44 
+- KNN: 0.77
+- Decision Tree: 0.78 
+- Bagging Classifier: 0.79
+- Random Forest: 0.80 
+- Gradient Boosting: 0.81
+- XGB Classifier: 0.80
+- SVC: 0.80
 
 **Regression Models: (MSE)**
-Gradient Boosting: 6.30E-05
-Random Forest Regressor: 6.73E-05
-Bagging Regressor: 6.52E-05
-LSTM: 7.61E-05
-FFNN: 7.69E-05
-Decision Tree Regressor: 8.06E-05
-Linear Regression: 8.13E-05
-RNN: 1.20E-04
-SVR: 2.19E-04
+- Gradient Boosting: 6.30E-05
+- Random Forest Regressor: 6.73E-05
+- Bagging Regressor: 6.52E-05
+- LSTM: 7.61E-05
+- FFNN: 7.69E-05
+- Decision Tree Regressor: 8.06E-05
+- Linear Regression: 8.13E-05
+- RNN: 1.20E-04
+- SVR: 2.19E-04
 
 
 ## Results
 
-Hyrum to add the importance features and their metrics 
-
 Random Forest Classifier
 
-Gradient Boosting Regressor
+Feature:     Importance
+
+- Open_pct_l1:        0.031
+- close_pct_l1:       0.479
+- Volume_diff_l1:     0.223
+- is_holiday_1:       0.024
+- day_of_week_1:      0.004
+- day_of_week_2:      0.004
+- day_of_week_3:      0.007
+- day_of_week_4:      0.009
+- day_of_week_5:      0.005
+- day_of_week_6:      0.215
+
+
+*Gradient Boosting Regressor*
+
+Feature:     Importance
+
+- Open_pct_l1:        0.017
+- close_pct_l1:       0.973
+- Volume_diff_l1:     0.008
+- is_holiday_1:       0.000
+- day_of_week_1:      0.001
+- day_of_week_2:      0.000
+- day_of_week_3:      0.001
+- day_of_week_4:      0.000
+- day_of_week_5:      0.000
+- day_of_week_6:      0.000
 
 
 ## Conclusions
@@ -125,6 +181,9 @@ Can sentiment analysis on business articles coupled with other NLP techniques pr
 YES! The models incorporating tokenized text (55.13%) and only sentiment (77.01%) beat that 50% bar. But the best models in prediction did not incorporate the news. The bar of 50% appears to be low after identifying ways to identify pricing trends using purely data from previous days. One possible theory for the model to not perform as well with sentiment of text is that it created more noise than aid. The correlating factors between sentiment of news and price direction were not particularly strong.
 
 Hyrum to discuss regression conclusions
+**Best Regression Model using Sentiment Analysis**
+Random Forest Regressor - 0.105MAE<br>
+This Regression analysis was a stepping stone to determine vaibility of concept and to stand as a baseline for further effort. With a 10.5% mean average error, it more than exeeded expectations and further analysis is warranted.
 
 **Best Models WITHOUT using news data**
 Random Forest Classifier - 80% Accurate
